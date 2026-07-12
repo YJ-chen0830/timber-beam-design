@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>木結構梁設計 | Timber Beam Design</title>
+<script src="https://yj-chen0830.github.io/jrh-core/jrh-core.js?v=3" defer></script>
+<style>
+  :root{--navy:#0b1f3a;--navy2:#13284a;--gold:#c9a14a;--gold2:#e0bf6e;--bg:#f5f3ee;--ink:#1c2530;--line:#d8d2c2;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Noto Sans TC","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f5f3ee;padding:28px 32px;}
+  header h1{margin:0;font-size:22px;}
+  header span{color:var(--gold2);font-size:13px;display:block;margin-top:4px;}
+  main{max-width:1060px;margin:0 auto;padding:28px 20px 60px;}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:24px;}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .card h2{font-size:14.5px;margin:0 0 18px;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--gold);padding-bottom:10px;}
+  label{display:block;font-size:12px;color:#666;margin:10px 0 4px;font-weight:500;}
+  input{width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;background:#fafaf8;}
+  input:focus{outline:none;border-color:var(--gold);}
+  .sec{font-size:12px;font-weight:700;color:var(--navy);margin:16px 0 6px;border-left:4px solid var(--gold);padding-left:9px;letter-spacing:.04em;text-transform:uppercase;}
+  .note{font-size:11.5px;color:#999;margin-top:12px;line-height:1.75;background:#f9f7f2;border-radius:6px;padding:9px 12px;}
+  button.calc-btn{margin-top:16px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--navy);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.calc-btn:hover{background:var(--navy2);}
+  button.pro-btn{margin-top:12px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--gold);color:var(--navy);font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.pro-btn:hover{filter:brightness(1.08);}
+  table{width:100%;border-collapse:collapse;margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{background:var(--navy);color:#f5f3ee;font-weight:600;font-size:12px;padding:9px 10px;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--line);}
+  tr:nth-child(even) td{background:#f9f7f3;}
+  td:last-child{text-align:right;font-weight:700;}
+  .ok{color:#1a7d3a;font-weight:700;}
+  .ng{color:#c0392b;font-weight:700;}
+  details.proc{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:#fafaf8;overflow:hidden;}
+  details.proc summary{cursor:pointer;padding:10px 14px;font-weight:700;font-size:13px;color:var(--navy);user-select:none;list-style:none;display:flex;align-items:center;gap:6px;}
+  details.proc summary::before{content:"▶";font-size:10px;transition:transform .2s;}
+  details[open].proc summary::before{transform:rotate(90deg);}
+  details.proc pre{margin:0;padding:12px 16px 16px;font-family:"Courier New",monospace;font-size:11.5px;line-height:1.9;white-space:pre-wrap;color:#2c3e50;border-top:1px solid var(--line);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .proj-section{background:#fff;border:1px solid var(--gold);border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+  .proj-section h3{margin:0 0 12px;color:var(--navy);font-size:14px;font-weight:700;}
+  .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:600px){.proj-grid,.row2{grid-template-columns:1fr;}}
+  .mob-tabs{display:none;}
+  @media screen and (max-width:767px){
+    .mob-tabs{display:flex;background:var(--bg);border-bottom:2px solid var(--line);margin:0 -20px 0;padding:0 20px;}
+    .mob-tab{flex:1;padding:11px 4px;text-align:center;font-size:13.5px;font-weight:700;color:#888;cursor:pointer;background:transparent;border:none;border-bottom:3px solid transparent;}
+    .mob-tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+    .grid{display:block;}
+    .grid>.card{display:none;}
+    .grid>.card.mob-active{display:block;}
+  }
+  @media print{
+    header,.no-print{display:none!important;}
+    body{background:#fff;margin:0;font-size:9pt;line-height:1.5;color:#111;}
+    main{padding:0;max-width:100%!important;}
+    .grid{grid-template-columns:1fr!important;gap:10pt!important;}
+    .card{box-shadow:none!important;border:1px solid #ccc!important;border-radius:4pt!important;padding:10pt 12pt!important;break-inside:avoid;}
+    .card h2{font-size:10.5pt!important;padding-bottom:6pt!important;margin-bottom:9pt!important;}
+    label{font-size:8pt!important;margin:6pt 0 2pt!important;}
+    .sec{font-size:8pt!important;margin:10pt 0 4pt!important;}
+    .note{font-size:7.5pt!important;padding:6pt 9pt!important;}
+    table{border:1px solid #bbb!important;border-radius:0!important;margin-top:6pt!important;}
+    th{font-size:8pt!important;padding:5pt 7pt!important;background:#0b1f3a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    td{font-size:8.5pt!important;padding:5pt 7pt!important;}
+    tr:nth-child(even) td{background:#f5f5f5!important;}
+    details.proc{display:block!important;margin-top:10pt!important;border:1pt solid #0b1f3a!important;border-radius:4pt!important;break-inside:avoid;background:#f9f9f6!important;}
+    details.proc>summary{display:none!important;}
+    details.proc::before{content:"📋  計算過程（供第三方檢核）";display:block;font-weight:700;font-size:8pt;color:#0b1f3a;padding:6pt 10pt 4pt;border-bottom:1px solid #ccc;letter-spacing:.04em;}
+    details.proc>pre{font-size:7pt!important;line-height:1.65!important;white-space:pre-wrap!important;padding:6pt 10pt 10pt!important;color:#1a1a1a!important;font-family:"Courier New",monospace!important;}
+    .proj-section{border:1.5pt solid #0b1f3a!important;border-radius:4pt!important;}
+    button.pro-btn,button.calc-btn{display:none!important;}
+    @page{margin:15mm 12mm;size:A4;}
+  }
+</style>
+</head>
+<body data-tool="twd">
+<header>
+  <a href="https://yj-chen0830.github.io/engineering-hub/" style="color:var(--gold2);font-size:12.5px;text-decoration:none;display:inline-block;margin-bottom:8px;">← 返回工程計算中心</a>
+  <h1>木結構梁設計</h1>
+  <span>簡支木梁均布載重設計 · NDS簡化容許應力法</span>
+</header>
+<main>
+
+<div class="proj-section no-print" id="projSection">
+  <h3>📁 專案資訊（列印時帶入計算書封面）</h3>
+  <div class="proj-grid">
+    <div><label>工程名稱</label><input id="pj-name" placeholder="○○工程"></div>
+    <div><label>工程地點</label><input id="pj-loc" placeholder="○○市○○區"></div>
+    <div><label>承造廠商</label><input id="pj-contractor" placeholder="○○營造股份有限公司"></div>
+    <div><label>文件編號</label><input id="pj-docno" placeholder="TWD-CAL-001"></div>
+    <div><label>計算者</label><input id="pj-calc" placeholder="姓名"></div>
+    <div><label>審核者</label><input id="pj-review" placeholder="姓名"></div>
+    <div><label>計算日期</label><input id="pj-date" type="date"></div>
+  </div>
+</div>
+
+<div class="mob-tabs">
+  <button class="mob-tab active" onclick="switchMobTab('twd-in',this)">📋 輸入參數</button>
+  <button class="mob-tab" id="mobTab-twd-r" onclick="switchMobTab('twd-r',this)">📊 計算結果</button>
+</div>
+<div class="grid">
+  <div class="card mob-active" data-tab="twd-in">
+    <h2>木梁設計輸入</h2>
+    <div class="sec">幾何與載重</div>
+    <div class="row2">
+      <div><label>跨度 L (m)</label><input id="twd-L" type="number" value="4" step="0.1" min="0"></div>
+      <div><label>設計均布載重 w (kN/m)</label><input id="twd-w" type="number" value="5" step="0.1" min="0"></div>
+    </div>
+    <div class="row2">
+      <div><label>梁寬 b (mm)</label><input id="twd-b" type="number" value="150" step="1" min="0"></div>
+      <div><label>梁深 d (mm)</label><input id="twd-d" type="number" value="300" step="1" min="0"></div>
+    </div>
+    <div class="sec">材料性質</div>
+    <div class="row2">
+      <div><label>容許彎曲應力 Fb (MPa)</label><input id="twd-Fb" type="number" value="10" step="0.1" min="0"></div>
+      <div><label>容許剪應力 Fv (MPa)</label><input id="twd-Fv" type="number" value="1" step="0.1" min="0"></div>
+    </div>
+    <div class="row2">
+      <div><label>彈性模數 E (MPa)</label><input id="twd-E" type="number" value="9000" step="100" min="0"></div>
+      <div><label>撓度限制分母</label><input id="twd-defl" type="number" value="360" step="1" min="1"></div>
+    </div>
+    <button class="calc-btn" onclick="calcTWD()">計算木結構梁設計</button>
+    <div class="note">本工具採簡化容許應力設計法（ASD），僅適用矩形斷面簡支梁承受均布載重之單一構材檢核，未考慮側向挫屈（Lateral Torsional Buckling）、含水率/持載時間修正係數（NDS調整係數 CD, CM, Ct等）。木材容許應力應依樹種等級查表取得，正式設計應由結構工程師依完整 NDS 規範複核。</div>
+  </div>
+  <div class="card" data-tab="twd-r">
+    <h2>計算結果</h2>
+    <div id="twd-result"><p style="color:#888">尚未計算</p></div>
+    <details class="proc" id="twd-proc" style="display:none">
+      <summary>📋 計算過程（供第三方檢核）</summary>
+      <pre id="twd-proc-text"></pre>
+    </details>
+    <button class="pro-btn no-print" onclick="openPro()">📄 產出計算書 PDF</button>
+  </div>
+</div>
+
+</main>
+<script>
+function switchMobTab(name,btn){
+  btn.parentElement.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  btn.parentElement.nextElementSibling.querySelectorAll('.card').forEach(function(c){
+    c.classList.toggle('mob-active',c.dataset.tab===name);
+  });
+}
+function openPro(){ JRH.checkEmail(function(){ jrhPrint('木結構梁設計計算書'); }); }
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+function f2(x){return x.toFixed(2);}
+function f3(x){return x.toFixed(3);}
+function f6(x){return x.toFixed(6);}
+function okng(ok){return ok?'<span class="ok">OK</span>':'<span class="ng">NG</span>';}
+
+function calculateTimberBeam(input){
+  var L=input.L, b=input.b, d=input.d, w=input.w, Fb=input.Fb, Fv=input.Fv, E=input.E, deflLimitDenom=input.deflLimitDenom;
+  var S=b*d*d/6;
+  var A=b*d;
+  var I=b*d*d*d/12;
+  var Mmax=w*L*L/8;
+  var Vmax=w*L/2;
+  var fb=Mmax*1e6/S;
+  var fv=1.5*Vmax*1000/A;
+  var Lmm=L*1000;
+  var defl_mm=5*w*Math.pow(Lmm,4)/(384*E*I);
+  var deflLimit=Lmm/deflLimitDenom;
+  return {
+    S:S,
+    A:A,
+    I:I,
+    Mmax:Mmax,
+    Vmax:Vmax,
+    fb:fb,
+    fv:fv,
+    Lmm:Lmm,
+    defl_mm:defl_mm,
+    deflLimit:deflLimit,
+    bendingOK:fb<=Fb,
+    shearOK:fv<=Fv,
+    deflOK:defl_mm<=deflLimit
+  };
+}
+
+function calcTWD(){
+  var input={
+    L:v('twd-L'),
+    b:v('twd-b'),
+    d:v('twd-d'),
+    w:v('twd-w'),
+    Fb:v('twd-Fb'),
+    Fv:v('twd-Fv'),
+    E:v('twd-E'),
+    deflLimitDenom:v('twd-defl')
+  };
+  var r=calculateTimberBeam(input);
+
+  document.getElementById('twd-result').innerHTML=
+    '<table><tr><th>項目</th><th>數值</th></tr>'+
+    '<tr><td>截面模數 S = bd²/6</td><td>'+f2(r.S)+' mm³</td></tr>'+
+    '<tr><td>截面面積 A = bd</td><td>'+f2(r.A)+' mm²</td></tr>'+
+    '<tr><td>慣性矩 I = bd³/12</td><td>'+f2(r.I)+' mm⁴</td></tr>'+
+    '<tr><td>最大彎矩 Mmax = wL²/8</td><td>'+f3(r.Mmax)+' kN·m</td></tr>'+
+    '<tr><td>最大剪力 Vmax = wL/2</td><td>'+f3(r.Vmax)+' kN</td></tr>'+
+    '<tr><td>彎曲應力 fb vs Fb</td><td>'+f6(r.fb)+' / '+f3(input.Fb)+' MPa '+okng(r.bendingOK)+'</td></tr>'+
+    '<tr><td>剪應力 fv vs Fv</td><td>'+f6(r.fv)+' / '+f3(input.Fv)+' MPa '+okng(r.shearOK)+'</td></tr>'+
+    '<tr><td>撓度 δ vs 容許值</td><td>'+f6(r.defl_mm)+' / '+f6(r.deflLimit)+' mm '+okng(r.deflOK)+'</td></tr>'+
+    '</table>';
+
+  var p='';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  p+='  木結構梁設計計算過程\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  p+='【一】輸入條件\n';
+  p+='  跨度 L = '+f3(input.L)+' m\n';
+  p+='  梁寬 b = '+f3(input.b)+' mm\n';
+  p+='  梁深 d = '+f3(input.d)+' mm\n';
+  p+='  設計均布載重 w = '+f3(input.w)+' kN/m\n';
+  p+='  容許彎曲應力 Fb = '+f3(input.Fb)+' MPa\n';
+  p+='  容許剪應力 Fv = '+f3(input.Fv)+' MPa\n';
+  p+='  彈性模數 E = '+f3(input.E)+' MPa\n';
+  p+='  撓度限制 = L/'+f3(input.deflLimitDenom)+'\n\n';
+  p+='【二】截面性質\n';
+  p+='  S = b·d²/6 = '+f3(input.b)+'×'+f3(input.d)+'²/6 = '+f6(r.S)+' mm³\n';
+  p+='  A = b·d = '+f3(input.b)+'×'+f3(input.d)+' = '+f6(r.A)+' mm²\n';
+  p+='  I = b·d³/12 = '+f3(input.b)+'×'+f3(input.d)+'³/12 = '+f6(r.I)+' mm⁴\n\n';
+  p+='【三】內力需求（簡支梁承受均布載重）\n';
+  p+='  Mmax = wL²/8 = '+f3(input.w)+'×'+f3(input.L)+'²/8 = '+f6(r.Mmax)+' kN·m\n';
+  p+='  Vmax = wL/2 = '+f3(input.w)+'×'+f3(input.L)+'/2 = '+f6(r.Vmax)+' kN\n\n';
+  p+='【四】彎曲應力檢核\n';
+  p+='  fb = Mmax×10⁶/S = '+f6(r.Mmax)+'×10⁶/'+f6(r.S)+' = '+f6(r.fb)+' MPa\n';
+  p+='  比較：fb = '+f6(r.fb)+' MPa '+(r.bendingOK?'≤':'＞')+' Fb = '+f3(input.Fb)+' MPa → '+(r.bendingOK?'OK ✓':'NG ✗')+'\n\n';
+  p+='【五】剪應力檢核（矩形斷面 1.5 倍剪應力係數）\n';
+  p+='  fv = 1.5×Vmax×1000/A = 1.5×'+f6(r.Vmax)+'×1000/'+f6(r.A)+' = '+f6(r.fv)+' MPa\n';
+  p+='  比較：fv = '+f6(r.fv)+' MPa '+(r.shearOK?'≤':'＞')+' Fv = '+f3(input.Fv)+' MPa → '+(r.shearOK?'OK ✓':'NG ✗')+'\n\n';
+  p+='【六】撓度檢核\n';
+  p+='  Lmm = L×1000 = '+f3(input.L)+'×1000 = '+f6(r.Lmm)+' mm\n';
+  p+='  均布載重換算：1 kN/m = 1 N/mm，故 w = '+f3(input.w)+' N/mm\n';
+  p+='  δ = 5wL⁴/(384EI)\n';
+  p+='    = 5×'+f3(input.w)+'×'+f6(r.Lmm)+'⁴/(384×'+f3(input.E)+'×'+f6(r.I)+')\n';
+  p+='    = '+f6(r.defl_mm)+' mm\n';
+  p+='  容許撓度 = Lmm/'+f3(input.deflLimitDenom)+' = '+f6(r.Lmm)+'/'+f3(input.deflLimitDenom)+' = '+f6(r.deflLimit)+' mm\n';
+  p+='  比較：δ = '+f6(r.defl_mm)+' mm '+(r.deflOK?'≤':'＞')+' '+f6(r.deflLimit)+' mm → '+(r.deflOK?'OK ✓':'NG ✗')+'\n\n';
+  p+='【七】結論\n';
+  p+='  彎曲：'+(r.bendingOK?'OK':'NG')+'；剪力：'+(r.shearOK?'OK':'NG')+'；撓度：'+(r.deflOK?'OK':'NG')+'\n';
+  p+='  本結果僅為矩形木梁 ASD 簡化檢核，正式設計應依完整 NDS 規範複核。\n';
+  document.getElementById('twd-proc-text').textContent=p;
+  document.getElementById('twd-proc').style.display='';
+  if(window.innerWidth<768){var b=document.getElementById('mobTab-twd-r');if(b)switchMobTab('twd-r',b);}
+}
+</script>
+<script>
+window.jrhDocMeta={
+ "doc":"木結構梁設計計算書",
+ "codes":[
+  "National Design Specification (NDS) for Wood Construction — 容許應力設計法簡化式"
+ ],
+ "notes":[
+  "本工具未計入 NDS 各項調整係數（CD持載期間、CM含水率、Ct溫度、CL側向穩定性等），容許應力應已包含或另行修正",
+  "木材容許應力 Fb, Fv 應依樹種等級（如花旗松、南方松等）查對應設計值表取得，本工具僅供已知容許應力後之構材檢核",
+  "側向挫屈（Lateral-Torsional Buckling）未納入本工具，深寬比過大之梁應另行檢討",
+  "本計算書應經結構工程技師簽證後，始得作為正式送審文件。"
+ ]
+};
+</script>
+</body>
+</html>
